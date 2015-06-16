@@ -1,5 +1,5 @@
 # SPSSINC MFP GLM
-## Estimate a regression with fractional polynomials for the sca
+## Estimate a regression with fractional polynomials for the scale variables
  This procedure estimates fractional polynomial models wit  h a variety of link functions.  Controls are available to limit the d  egree of the polynomial
 
 ---
