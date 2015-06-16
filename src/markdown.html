@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>SPSSINC MFP GLM Extension Command</title>
+
+<link rel="stylesheet" type="text/css" href="extsyntax.css" />
+
+
+
+
+
+</head>
+
+<body>
+<h1>SPSSINC MFP GLM Extension Command</h1>
+
+<p>Estimate a regression with fractional polynomials for the scale variables</p>
+<div class="syntax">
+<p>SPSSINC MFP GLM  DEPENDENT=<em>dependent variable</em><sup>&#42;</sup><br/>
+COVAR = <em>scale independent variables</em><br/>
+FACTOR = <em>categorical independent variables</em><br/>
+VARIABLEALPHA = <em>significance or list of significances, one for each variable</em><br/>
+FPALPHA = <em>significance or list of significances</em><br/>
+DF = <em>degrees of freedom or list of dfs, one for each scale variable</em><br/>
+FAMILY = GAUSSIAN<sup>&#42;&#42;</sup> or BINOMIAL or POISSON or GAMMA or INVERSEGAUSSIAN or QUASI<br/>
+LINK = <em>link name</em>  </p>
+
+<p>/OPTIONS MISSING=LISTWISE<sup>&#42;&#42;</sup> or FAIL<br/>
+PLOTS = YES or NO<sup>&#42;&#42;</sup></p>
+
+<p>/SAVE PROGRAMFILE = &ldquo;<em>filespec</em>&rdquo;<br/>
+RESIDUALSDATASET = <em>dataset</em><br/>
+COEFSDATASET = <em>dataset</em>.</p>
+
+<p>/HELP</p>
+
+<p><sup>&#42;</sup> Required<br/>
+<sup>&#42;&#42;</sup> Default</p>
+</div>
+<p>SPSSINC MFP GLM /HELP prints this information and does nothing else.</p>
+
+<pre class="example"><code>SPSSINC MFPGLM DEPENDENT=mpg COVAR=engine weight FACTOR=origin
+DF=3 3.
+</code></pre>
+
+<p>Split files and weight are not honored by this command.</p>
+
+<p><strong>DEPENDENT</strong> specifies the dependent variable.  Continuous predictors are
+specified as <strong>COVAR</strong> and factors as <strong>FACTOR</strong>.  Categorical independent variables are automatically converted appropriately to factors.  A constant term is automatically included.</p>
+
+<p><strong>VARIABLEALPHA</strong> specifies the significance level for inclusion of variables,
+and <strong>FPALPHA</strong> specifies the significance level for polynomial terms.  Both can be
+a single number applied to all relevant variables or a list of numbers.  If a list,
+there must be as many values as the total number of predictors (VARIABLEALPHA)
+or the number of covariates.  Use 1 for non-polynomial covariates.</p>
+
+<p><strong>DF</strong>, also a single number or a list of numbers, specifies the parameters for
+the polynomials.  The choices are</p>
+
+<ul>
+<li>1: linear model </li>
+<li>2: FP model with maximum degree 1,</li>
+<li>4: FP model with maximum degree 2.</li>
+</ul>
+
+<p><strong>FAMILY</strong> specifies the model.</p>
+
+<p><strong>LINK</strong> specifies the link function.  Valid values depend on the family.
+mu stands for <code>1/mu^2</code>
+The choices are</p>
+
+<ul>
+<li>GAUSSIAN:  IDENTITY<sup>&#42;&#42;</sup> or LOG or INVERSE</li>
+<li>BINOMIAL:   LOGIT<sup>&#42;&#42;</sup> or PROBIT or CAUCHIT or CLOGLOG</li>
+<li>GAMMA: INVERSE<sup>&#42;&#42;</sup> or IDENTITY or LOG</li>
+<li>POISSON:    log<sup>&#42;&#42;</sup> or IDENTITY or SQRT</li>
+<li>INVERSEGAUSSIAN: MU or INVERSE or IDENTITY or LOG</li>
+<li>QUASI: LOGIT<sup>&#42;&#42;</sup> or PROBIT or CLOGLOG or IDENTITY or INVERSE or LOG or MU or SQRT</li>
+</ul>
+
+<h2>OPTIONS</h2>
+
+<p><strong>MISSING</strong> = LISTWISE causes listwise deletion of missing values.  FAIL 
+stops the procedure if missing values are encountered.</p>
+
+<p><strong>PLOTS</strong> determines whether plots are produced.</p>
+
+<h2>SAVE</h2>
+
+<p><strong>PROGRAMFILE</strong> causes the R code for this procedure to be written to 
+the specified file.  The generated program can be a useful starting point 
+for additional specifications.</p>
+
+<p><strong>RESIDUALSDATASET</strong> causes a dataset containing the residuals to be created.
+The dataset name must not already be in use.
+The case number is included as cases will only be written for input cases with no
+missing data.  Data filtered by SPSS Statistics are not passed to R and will not
+generate cases in the residuals dataset.</p>
+
+<p><strong>COEFSDATASET</strong> causes a new dataset containing the coefficients to be created.
+The dataset name must not already be in use.</p>
+
+<p>&copy; Copyright IBM Corp. 1989, 2014</p>
+
+</body>
+
+</html>
+
