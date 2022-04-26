@@ -9,7 +9,7 @@ Description: This procedure estimates fractional polynomial models wit
  h a variety of link functions.  Controls are available to limit the d
  egree of the polynomial
 Author: JKP, IBM SPSS
-Version: 1.0.3
+Version: 1.0.4
 Product-Version: 18
 Plugins: Python,R
 R-Packages: mfp
