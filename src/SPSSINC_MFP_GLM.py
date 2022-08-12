@@ -17,6 +17,7 @@ __version__ = "1.0.2"
 # history
 # 10-apr-2009 original version
 #  12-jun-2009 add ask=FALSE parameter to plot for interactive mode
+# 12-aug-2022 update for Python3
 ###import wingdbstub    ### debug
 
 import spss, spssaux
@@ -97,7 +98,7 @@ This extension command requires the Python and R programmability plug-ins and
 the R car package.
 """
 familylinks = {
-        "gaussian" : ["identity", "log", "inverse"],
+    "gaussian" : ["identity", "log", "inverse"],
         "binomial" : ["logit","probit","cauchit","cloglog"],
         "gamma" : ["inverse", "identity","log"],
         "poisson" : ["log","identity","sqrt"],
@@ -105,73 +106,73 @@ familylinks = {
         "quasi" : ["logit","probit","cloglog","identity","inverse","log","mu","sqrt"]}
 
 def fpreg(dep, covar,factor=None, variablealpha=None, fpalpha=None, 
-       df=[4], family="gaussian", link=None, missing="listwise", 
+          df=[4], family="gaussian", link=None, missing="listwise", 
        programfile=None, residualsdataset=None, coefsdataset=None,
        plots=False):
-        """run fractional polynomial regression via mfp package
+    """run fractional polynomial regression via mfp package
 
-        dep is the dependent variable name.
-        
-        
-        missing is "listwise" or "fail" according to the desired missing value treatment.
-        programfile, if specified, causes the generated R program to be written to that file.
-        residualsdataset causes a dataset of residuals to be created.
-        coefdataset causes a dataset of terms and coefficients to be created.
+    dep is the dependent variable name.
+
+
+    missing is "listwise" or "fail" according to the desired missing value treatment.
+    programfile, if specified, causes the generated R program to be written to that file.
+    residualsdataset causes a dataset of residuals to be created.
+    coefdataset causes a dataset of terms and coefficients to be created.
 """
 
-        # This function generates an R program and submits it via INSERT.
-        if factor is None:
-                factor = []
-        if variablealpha is None:
-                variablealpha = [.05]
-        if len(variablealpha) == 1:
-                variablealpha = len(covar)*variablealpha
-        alpha0 = variablealpha[0]
-        if fpalpha is None:
-                fpalpha = [.05]
-        if len(fpalpha) == 1:
-                fpalpha = len(covar) * [fpalpha[0]]
-        if len(df) == 1:
-                df = len(covar) * [df[0]]
-        if 3 in df:
-                raise ValueError("df must be 1, 3, or 4")
-        if len(fpalpha) != len(covar):
-                raise ValueError("The number of fp alpha values is different from the number of covariates")
-        if len(variablealpha) != len(covar):
-                raise ValueError("The number of variable alpha values is different from the number of variables")
-        if len(df) != len(covar):
-                raise ValueError("The number of df specifications is different from the number of covariates")
-        if link is not None and not link in familylinks[family]:
-                raise ValueError("Link function not valid for family.  Valid choices are " + ", ".join(familylinks[family]))
-        if family == "inversegaussian":
-                family = "inverse.gaussian"
-        if link == "mu":
-                link = "1/mu^2"
-        if not link is None:
-                
-                family = family + "(" + link + ")"
-        missing = missing == "listwise" and "na.exclude" or "na.fail"
-        plots = plots and "TRUE" or "FALSE"
-        # check the independent variables measurement levels and code accordingly
-        dfex = []
-        catlistnames = ['"' + item + '"' for item in factor]
-        catlistrindex = [str(i+len(covar) + 2) for i in range(len(factor))]
-        allvars = "c(" + ", ".join(['"' + v + '"' for v in [dep] + covar + factor]) + ")"
-        allvars = "\n".join(textwrap.wrap(allvars, width=100))
-        covarfuncs = []
-        for i, v in enumerate(covar):
-                covarfuncs.append("fp(%s, df=%s, select=%s, alpha=%s)" % \
-                        (v, df[i], variablealpha[i], fpalpha[i]))
-        model = dep + "~" + \
-              "\n".join(textwrap.wrap(" +".join(covarfuncs + factor)))
+    # This function generates an R program and submits it via INSERT.
+    if factor is None:
+        factor = []
+    if variablealpha is None:
+        variablealpha = [.05]
+    if len(variablealpha) == 1:
+        variablealpha = len(covar)*variablealpha
+    alpha0 = variablealpha[0]
+    if fpalpha is None:
+        fpalpha = [.05]
+    if len(fpalpha) == 1:
+        fpalpha = len(covar) * [fpalpha[0]]
+    if len(df) == 1:
+        df = len(covar) * [df[0]]
+    if 3 in df:
+        raise ValueError("df must be 1, 3, or 4")
+    if len(fpalpha) != len(covar):
+        raise ValueError("The number of fp alpha values is different from the number of covariates")
+    if len(variablealpha) != len(covar):
+        raise ValueError("The number of variable alpha values is different from the number of variables")
+    if len(df) != len(covar):
+        raise ValueError("The number of df specifications is different from the number of covariates")
+    if link is not None and not link in familylinks[family]:
+        raise ValueError("Link function not valid for family.  Valid choices are " + ", ".join(familylinks[family]))
+    if family == "inversegaussian":
+        family = "inverse.gaussian"
+    if link == "mu":
+        link = "1/mu^2"
+    if not link is None:
 
-        catlistnames = "c(" + ", ".join(catlistnames) + ")"
-        catlistnames = "\n".join(textwrap.wrap(catlistnames, width=100))
-        catlistrindex =  "c(" + ", ".join(catlistrindex) + ")"
-        catlistrindex = "\n".join(textwrap.wrap(catlistrindex, width=100))
+        family = family + "(" + link + ")"
+    missing = missing == "listwise" and "na.exclude" or "na.fail"
+    plots = plots and "TRUE" or "FALSE"
+    # check the independent variables measurement levels and code accordingly
+    dfex = []
+    catlistnames = ['"' + item + '"' for item in factor]
+    catlistrindex = [str(i+len(covar) + 2) for i in range(len(factor))]
+    allvars = "c(" + ", ".join(['"' + v + '"' for v in [dep] + covar + factor]) + ")"
+    allvars = "\n".join(textwrap.wrap(allvars, width=100))
+    covarfuncs = []
+    for i, v in enumerate(covar):
+        covarfuncs.append("fp(%s, df=%s, select=%s, alpha=%s)" % \
+                                  (v, df[i], variablealpha[i], fpalpha[i]))
+    model = dep + "~" + \
+            "\n".join(textwrap.wrap(" +".join(covarfuncs + factor)))
 
-        if residualsdataset:
-                residuals = """dict<- spssdictionary.CreateSPSSDictionary(c("caseNumber", "Case Number", 0, "F8.0", "nominal"),
+    catlistnames = "c(" + ", ".join(catlistnames) + ")"
+    catlistnames = "\n".join(textwrap.wrap(catlistnames, width=100))
+    catlistrindex =  "c(" + ", ".join(catlistrindex) + ")"
+    catlistrindex = "\n".join(textwrap.wrap(catlistrindex, width=100))
+
+    if residualsdataset:
+        residuals = """dict<- spssdictionary.CreateSPSSDictionary(c("caseNumber", "Case Number", 0, "F8.0", "nominal"),
 c("mfpResiduals", as.character(res$call[2]), 0, "F8.2", "scale"))
 tryCatch({
 spssdictionary.SetDictionaryToSPSS("%(residualsdataset)s", dict)
@@ -181,10 +182,10 @@ error=function(e) {print(e)
 print("Failed to create residuals dataset.  Dataset name must not already exist: %(residualsdataset)s")}
 )
 """ % locals()
-        else:
-                residuals= ""
-        if coefsdataset:
-                coefs = """dict<- spssdictionary.CreateSPSSDictionary(c("term", "Variable or Factor Value", 100, "A100", "nominal"),
+    else:
+        residuals= ""
+    if coefsdataset:
+        coefs = """dict<- spssdictionary.CreateSPSSDictionary(c("term", "Variable or Factor Value", 100, "A100", "nominal"),
 c("coefficient", "Estimated Coefficient", 0, "F10.3", "scale"))
 tryCatch({
 spssdictionary.SetDictionaryToSPSS("%(coefsdataset)s", dict)
@@ -193,10 +194,10 @@ error=function(e) {print(e)
 print("Failed to create coefficients dataset.  Dataset name must not already exist: %(coefsdataset)s")
 })
 """ % locals()
-        else:
-                coefs = ""
+    else:
+        coefs = ""
 
-        pgm = r"""BEGIN PROGRAM R.
+    pgm = r"""BEGIN PROGRAM R.
 library(mfp)
 makefactor = function(var, vallabels, ordfac) {
 # return a labeled factor for variable var and label set vallabels
@@ -208,16 +209,16 @@ lmatch = match(vallabels$values, values, nomatch=0)
 lmatch2 = match(values[lmatch], vallabels$values)
 lbls[lmatch] = vallabels$labels[lmatch2]
 if (ordfac) {
-  return (ordered(var, levels=values, labels=lbls))}
+            return (ordered(var, levels=values, labels=lbls))}
 else {
-  return (factor(var, levels=values, labels=lbls))
+            return (factor(var, levels=values, labels=lbls))
 }
 }
 loopfactor = function(vars, indexes) {
 if (length(indexes) == 0) {return(dta)}
 for (v in 1:length(indexes)) {
-  vl = spssdictionary.GetValueLabels(vars[v])
-  dta[indexes[v]] = makefactor(dta[[indexes[v]]], vl, FALSE)
+            vl = spssdictionary.GetValueLabels(vars[v])
+            dta[indexes[v]] = makefactor(dta[[indexes[v]]], vl, FALSE)
 }
 return(dta)
 }
@@ -233,53 +234,53 @@ is.na(dta)<- is.na(dta)
 dta=loopfactor(catlistnames, catlistrindex)
 
 res <- tryCatch(
-    summary(
-        reslm <- mfp(%(model)s, 
-          data=dta, na.action=%(missing)s,
-          family=%(family)s, alpha=%(alpha0)s)
-    ),
+            summary(
+            reslm <- mfp(%(model)s, 
+            data=dta, na.action=%(missing)s,
+            family=%(family)s, alpha=%(alpha0)s)
+            ),
 error=function(e) 
-    {return(c("ERROR:",e))}
+            {return(c("ERROR:",e))}
 )
 
 if (!is.null(res$message)) {print(res$message);break} else {
-  caption = paste("Dependent variable:", strsplit(as.character(reslm$call[2]),"~")[[1]][1])
-  f1=res$family$family  # does not work directly as sprintf argument
-  f2=res$family$link
-  f3=res$dispersion  
-  caption = paste(caption, sprintf("Family: %%s.  Link function: %%s.  Dispersion parameter: %%.3f",
-    f1, f2, f3), sep="\n")
-  colnames(res$coefficients)[4] = "Sig."
-  spsspivottable.Display(coefficients(res), 
-    title="Multiple Fractional Polynomial Linear Model: Coefficients", "SPSSINCMFPMODEL",
-    caption=caption,
-    isSplit=FALSE,
-    format = formatSpec.Coefficient)
+            caption = paste("Dependent variable:", strsplit(as.character(reslm$call[2]),"~")[[1]][1])
+            f1=res$family$family  # does not work directly as sprintf argument
+            f2=res$family$link
+            f3=res$dispersion  
+            caption = paste(caption, sprintf("Family: %%s.  Link function: %%s.  Dispersion parameter: %%.3f",
+            f1, f2, f3), sep="\n")
+            colnames(res$coefficients)[4] = "Sig."
+            spsspivottable.Display(coefficients(res), 
+            title="Multiple Fractional Polynomial Linear Model: Coefficients", "SPSSINCMFPMODEL",
+            caption=caption,
+            isSplit=FALSE,
+            format = formatSpec.Coefficient)
 
-    colnames(reslm$fptable)[3] = "Fpalpha"
-    colnames(reslm$fptable)[2] = "Variable alpha"
-    spsspivottable.Display(reslm$fptable, title="Multiple Fractional Polynomial Linear Model: Fp Transformations", "SPSSINCMFPFPTRANS",
-    caption=reslm$formula[3], isSplit=FALSE)
-    
-    spsspivottable.Display(reslm$scale, title="Multiple Fractional Polynomial Linear Model: Predictor Scaling",
-        "SPSSINCMFPSCALE", isSplit=FALSE)
-    
-    rowl=c("Null deviance", "Residual deviance", "AIC")
-    c1 = c(round(res$null.deviance, 3), round(res$deviance, 3), round(res$aic,3))
-    c2 = c(res$df.null, res$df.residual, "")
-    dfr = data.frame(cbind(c1, c2), row.names=rowl)
-    colnames(dfr)[1:2] = c("Statistic", "D. f.")
-    spsspivottable.Display(dfr, 
-    title="Multiple Fractional Polynomial Regression: Deviance",    
-    "SPSSINCMFPSTATS", isSplit=FALSE)
+            colnames(reslm$fptable)[3] = "Fpalpha"
+            colnames(reslm$fptable)[2] = "Variable alpha"
+            spsspivottable.Display(reslm$fptable, title="Multiple Fractional Polynomial Linear Model: Fp Transformations", "SPSSINCMFPFPTRANS",
+            caption=reslm$formula[3], isSplit=FALSE)
 
-    if (plots) {
-      plot(reslm, main="Multiple Fractional Polynomial Linear Model", col="blue", lwd=2, ask=FALSE)
-    }
-      
-   %(residuals)s
-   %(coefs)s
-   spssdictionary.EndDataStep()
+            spsspivottable.Display(reslm$scale, title="Multiple Fractional Polynomial Linear Model: Predictor Scaling",
+            "SPSSINCMFPSCALE", isSplit=FALSE)
+
+            rowl=c("Null deviance", "Residual deviance", "AIC")
+            c1 = c(round(res$null.deviance, 3), round(res$deviance, 3), round(res$aic,3))
+            c2 = c(res$df.null, res$df.residual, "")
+            dfr = data.frame(cbind(c1, c2), row.names=rowl)
+            colnames(dfr)[1:2] = c("Statistic", "D. f.")
+            spsspivottable.Display(dfr, 
+            title="Multiple Fractional Polynomial Regression: Deviance",    
+            "SPSSINCMFPSTATS", isSplit=FALSE)
+
+            if (plots) {
+            plot(reslm, main="Multiple Fractional Polynomial Linear Model", col="blue", lwd=2, ask=FALSE)
+            }
+
+            %(residuals)s
+            %(coefs)s
+            spssdictionary.EndDataStep()
 
 }
 
@@ -288,37 +289,36 @@ rm(res)
 rm(reslm)
 END PROGRAM   .
 """ % locals()
-        # write program to a temporary or user-specified file
-        if programfile:
-                cmdfile = programfile.replace("\\", "/")
-        else:
-                cmdfile = (tempfile.gettempdir() + os.sep + "pgm.R").replace("\\", "/")
-        f = codecs.open(cmdfile, "wb", encoding="utf_8_sig")
-        f.write(pgm)
-        f.close()
+    # write program to a temporary or user-specified file
+    if programfile:
+        cmdfile = programfile.replace("\\", "/")
+    else:
+        cmdfile = (tempfile.gettempdir() + os.sep + "pgm.R").replace("\\", "/")
+    f = codecs.open(cmdfile, "wb", encoding="utf_8_sig")
+    f.write(pgm)
+    f.close()
 
 
-        spss.Submit("INSERT FILE='%s'" % cmdfile)
-        if not programfile:
-                os.remove(cmdfile)
+    spss.Submit("INSERT FILE='%s'" % cmdfile)
+    if not programfile:
+        os.remove(cmdfile)
 
 
 
 def Run(args):
-        """Execute the SPSSINC ROBUST REGRESSION command"""
+    """Execute the SPSSINC MFP GLM command"""
 
-        args = args[args.keys()[0]]
-        ###print args   #debug
+    args = args[list(args.keys())[0]]
 
-        oobj = Syntax([
-                Template("DEPENDENT", subc="",  ktype="existingvarlist", var="dep", islist=False),
+    oobj = Syntax([
+            Template("DEPENDENT", subc="",  ktype="existingvarlist", var="dep", islist=False),
                 Template("COVAR", subc="",  ktype="existingvarlist", var="covar", islist=True),
                 Template("FACTOR", subc="",  ktype="existingvarlist", var="factor", islist=True),
                 Template("VARIABLEALPHA", subc="", ktype="float", var="variablealpha", vallist=[0.,1.], islist=True),
                 Template("FPALPHA", subc="", ktype="float", var="fpalpha", vallist=[0.,1.], islist=True),
                 Template("DF", subc="", ktype="int", var="df", vallist=[1,4], islist=True),
                 Template("FAMILY", subc="", ktype="str", var="family", 
-                        vallist=["gaussian", "binomial", "poisson", "gamma", "inversegaussian", "quasi"], islist=False),
+                         vallist=["gaussian", "binomial", "poisson", "gamma", "inversegaussian", "quasi"], islist=False),
                 Template("LINK", subc="", ktype="str", var="link"),
                 Template("MISSING", subc="OPTIONS",ktype="str", var="missing"),
                 Template("PLOTS", subc="OPTIONS", ktype="bool", var="plots"),
@@ -327,24 +327,24 @@ def Run(args):
                 Template("COEFSDATASET", subc="SAVE", ktype="literal", var="coefsdataset"),
                 Template("HELP", subc="", ktype="bool")])
 
-        # A HELP subcommand overrides all else
-        if args.has_key("HELP"):
-                #print helptext
-                helper()
-        else:
-                processcmd(oobj, args, fpreg, vardict=spssaux.VariableDict())
+    # A HELP subcommand overrides all else
+    if "HELP" in args:
+        #print helptext
+        helper()
+    else:
+        processcmd(oobj, args, fpreg, vardict=spssaux.VariableDict())
 
 def helper():
     """open html help in default browser window
-    
+
     The location is computed from the current module name"""
-    
+
     import webbrowser, os.path
-    
+
     path = os.path.splitext(__file__)[0]
     helpspec = "file://" + path + os.path.sep + \
-         "markdown.html"
-    
+        "markdown.html"
+
     # webbrowser.open seems not to work well
     browser = webbrowser.get()
     if not browser.open_new(helpspec):

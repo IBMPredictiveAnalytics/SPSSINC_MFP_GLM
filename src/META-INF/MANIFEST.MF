@@ -2,7 +2,7 @@ Name: SPSSINC MFP GLM
 Dialog-Specs: SPSSINC_MFP_GLM.spd
 Command-Specs: SPSSINC_MFP_GLM.xml
 Code-Files: SPSSINC_MFP_GLM.py
-Misc-Files: markdown.html,extsyntax.css,IBMdialogicon.png
+Misc-Files: extsyntax.css,IBMdialogicon.png,markdown.html
 Summary: Estimate a regression with fractional polynomials for the sca
  le variables
 Description: This procedure estimates fractional polynomial models wit
@@ -10,6 +10,7 @@ Description: This procedure estimates fractional polynomial models wit
  egree of the polynomial
 Author: JKP, IBM SPSS
 Version: 1.0.4
-Product-Version: 18
+Product-Version: 24
 Plugins: Python,R
+Python-Version: 3
 R-Packages: mfp
