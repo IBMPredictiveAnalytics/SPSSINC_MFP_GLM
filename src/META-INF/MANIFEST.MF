@@ -1,4 +1,5 @@
 Name: SPSSINC MFP GLM
+Display-Name: Fractional Polynomial
 Dialog-Specs: SPSSINC_MFP_GLM.spd
 Command-Specs: SPSSINC_MFP_GLM.xml
 Code-Files: SPSSINC_MFP_GLM.py
